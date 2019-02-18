@@ -6,90 +6,62 @@
 /*   By: behiraux <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/23 20:16:08 by behiraux          #+#    #+#             */
-/*   Updated: 2019/01/31 15:21:08 by behiraux         ###   ########.fr       */
+/*   Updated: 2019/02/05 16:48:40 by behiraux         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char			*ft_strjoinfree(char *s1, char *s2)
+static int	ft_line(char **s, char **line, int fd, int ret)
 {
-	char	*s3;
-	int		size;
-	int		i;
-	int		j;
+	char		*tmp;
+	int			n;
 
-	if (!s1 && s2)
-		return (ft_strdup(s2));
-	if (!s2 && s1)
-		return (s1);
-	if (!s1 && !s2)
-		return (0);
-	size = (ft_strlen(s1) + ft_strlen(s2));
-	if (!(s3 = (char *)malloc(sizeof(char) * (size + 1))))
-		return (0);
-	i = 0;
-	j = 0;
-	while (s1[i] != '\0')
-		s3[j++] = s1[i++];
-	i = 0;
-	free(s1);
-	while (s2[i] != '\0')
-		s3[j++] = s2[i++];
-	s3[j] = '\0';
-	return (s3);
+	n = 0;
+	while (s[fd][n] != '\n' && s[fd][n] != '\0')
+		n++;
+	if (s[fd][n] == '\n')
+	{
+		*line = ft_strsub(s[fd], 0, n);
+		tmp = ft_strdup(s[fd] + n + 1);
+		free(s[fd]);
+		s[fd] = tmp;
+		if (s[fd][0] == '\0')
+			ft_strdel(&s[fd]);
+	}
+	else if (s[fd][n] == '\0')
+	{
+		if (ret == BUFF_SIZE)
+			return (get_next_line(fd, line));
+		*line = ft_strdup(s[fd]);
+		ft_strdel(&s[fd]);
+	}
+	return (1);
 }
 
-static int		ft_read(int const fd, char **stack)
+int			get_next_line(int const fd, char **line)
 {
-	char	*buff;
-	int		ret;
+	int			ret;
+	static char	*s[255];
+	char		*tmp;
+	char		buff[BUFF_SIZE + 1];
 
-	if (!(buff = (char *)ft_strnew(sizeof(*buff) * (BUFF_SIZE + 1))))
+	if (fd < 0 || line == NULL)
 		return (-1);
-	ret = read(fd, buff, BUFF_SIZE);
-	if (ret > 0)
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
 		buff[ret] = '\0';
-		*stack = ft_strjoinfree(*stack, buff);
+		if (s[fd] == NULL)
+			s[fd] = ft_strnew(1);
+		tmp = ft_strjoin(s[fd], buff);
+		free(s[fd]);
+		s[fd] = tmp;
+		if (ft_strchr(buff, '\n'))
+			break ;
 	}
-	free(buff);
-	return (ret);
-}
-
-static char		ft_give_line(char **line, char **stack, char *endline)
-{
-	*line = ft_strsub(*stack, 0, (ft_strlen(*stack) - ft_strlen(endline)));
-	endline = ft_strdup(endline);
-	ft_strdel(stack);
-	*stack = ft_strdup(endline + 1);
-	free(endline);
-	return (0);
-}
-
-int				get_next_line(int const fd, char **line)
-{
-	static char	*stack[1024];
-	char		*endline;
-	int			ret;
-
-	if (!line || fd < 0 || BUFF_SIZE < 0)
+	if (ret < 0)
 		return (-1);
-	endline = ft_strchr(stack[fd], '\n');
-	while (endline == NULL)
-	{
-		ret = ft_read(fd, &stack[fd]);
-		if (ret == 0)
-		{
-			if (ft_strlen(stack[fd]) == 0)
-				return (0);
-			stack[fd] = ft_strjoinfree(stack[fd], "\n");
-		}
-		if (ret < 0)
-			return (-1);
-		else
-			endline = ft_strchr(stack[fd], '\n');
-	}
-	ft_give_line(line, &stack[fd], endline);
-	return (1);
+	else if (ret == 0 && (s[fd] == NULL || s[fd][0] == '\0'))
+		return (0);
+	return (ft_line(s, line, fd, ret));
 }

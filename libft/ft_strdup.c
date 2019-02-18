@@ -6,7 +6,7 @@
 /*   By: behiraux <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/12 14:23:12 by behiraux          #+#    #+#             */
-/*   Updated: 2019/01/31 15:31:42 by behiraux         ###   ########.fr       */
+/*   Updated: 2019/02/05 16:39:49 by behiraux         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,7 @@ char	*ft_strdup(const char *s1)
 		return (NULL);
 	i = ft_strlen(s1);
 	if (!(s2 = (char*)malloc(sizeof(char) * (i + 1))))
-	{
-		errno = ENOMEM;
 		return (NULL);
-	}
 	i = 0;
 	while (s1[i])
 	{

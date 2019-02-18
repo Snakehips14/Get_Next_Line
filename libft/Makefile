@@ -6,7 +6,7 @@
 #    By: behiraux <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/11/19 14:04:26 by behiraux          #+#    #+#              #
-#    Updated: 2019/01/23 20:02:20 by behiraux         ###   ########.fr        #
+#    Updated: 2019/02/05 16:57:39 by behiraux         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ SRC = ft_strchr.c\
 	  ft_strlen.c\
 	  ft_strnew.c\
 	  ft_strsub.c\
+	  ft_strjoin.c\
 
 CC = gcc
 
